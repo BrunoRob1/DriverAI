@@ -15,6 +15,10 @@ def print_curves(t, y1, y2):
     plt.plot(t, y2, 'b')
     plt.show()
 
+def print_curve(t, y):
+    plt.plot(t, y, 'b')
+    plt.show()
+
 
 def test_omega_veh_lane3_overtake_ego_lane2():
     simulation = Simulation()
@@ -29,7 +33,7 @@ def test_omega_veh_lane3_overtake_ego_lane2():
     omega0 = np.zeros(0)
 
     for i in range(0, 201):
-        ang_speed = simulation.get_traffic().ego.angular_speed_of_vehicle_from_ego(1)*180/math.pi
+        ang_speed = simulation.get_traffic().get_vehicles[0].angular_speed_of_vehicle_from_ego(1)*180/math.pi
         omega0 = np.append(omega0, ang_speed)
         if ang_speed >= 0.5:
             omega_higher_than_threshold.append(1)
@@ -42,19 +46,25 @@ def test_omega_veh_lane3_overtake_ego_lane2():
     print_curves(simulation.time_values, omega_higher_than_threshold, np.log(omega0))
 
 
-def test_front_vehicle():
+def test_front_vehicle_same_speed():
     simulation = Simulation()
     print("hello")
     # Ego vehicle in the lane 2 (middle) in a highway
     simulation.get_traffic().set_ego(2, 120)
 
     # Vehicle in lane 3 (left) overtakes Ego vehicle in that highway
-    simulation.get_traffic().add_vehicle(2, -300, 140, index=1)
+    def security_distance(speed_kmh):
+        return speed_kmh/3.6 + 4.5
+
+    simulation.get_traffic().add_vehicle(2, -security_distance(120)/2.0, 120, index=1)
+
     simulation.add_output("EGO.y", "simulation.get_traffic().get_vehicle(0).pos")
     simulation.add_output("EGO.Vy", "simulation.get_traffic().get_vehicle(0).v_kmh")
 
     simulation.add_output("VEH1.y", "simulation.get_traffic().get_vehicle(1).pos")
     simulation.add_output("VEH1.Vy", "simulation.get_traffic().get_vehicle(1).v_kmh")
+
+    simulation.add_output("VEH1.security_time", "simulation.get_traffic().get_vehicle(1).current_security_time")
 
     simulation.print_outputs()
 
@@ -66,12 +76,13 @@ def test_front_vehicle():
 
     print_curves(t, simulation.get_output("VEH1.y"), simulation.get_output("EGO.y"))
     print_curves(t, simulation.get_output("VEH1.Vy"), simulation.get_output("EGO.Vy"))
+    print_curve(t, simulation.get_output("VEH1.security_time"))
 
     print("end of simulation")
 
 
 if __name__ == '__main__':
     #test_omega_veh_lane3_overtake_ego_lane2()
-    test_front_vehicle()
+    test_front_vehicle_same_speed()
 
 

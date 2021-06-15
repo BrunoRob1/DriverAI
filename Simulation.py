@@ -36,10 +36,12 @@ class Simulation:
 
         # check if we need to add vehicles as input
         min_angular_speed_detectable = 0.01
+        """
         for index in self.traffic.vehicles.keys():
             vehicle = self.traffic.vehicles[index]
-            if self.traffic.ego.angular_speed_of_vehicle_from_ego(index) > min_angular_speed_detectable:
+            if self.traffic.vehicles[0].angular_speed_of_vehicle_from_ego(index) > min_angular_speed_detectable:
                 pass # vehicle is in neuron inputs
+        """
 
     def print_outputs(self):
         for output in self.outputs.values():

@@ -5,11 +5,10 @@ class Traffic:
     def __init__(self, simulation):
         self.simulation = simulation
         self.vehicles = {}  # type: dict[Vehicle]
-        self.ego = None     # type: EgoVehicle
 
     def set_ego(self, lane, velocity):
         import EgoVehicle
-        self.ego = EgoVehicle.EgoVehicle(lane, velocity, self)
+        self.vehicles[0] = EgoVehicle.EgoVehicle(lane, velocity, self)
 
     def add_vehicle(self, lane, relative_pos, velocity):
         index = len(self.vehicles)
@@ -25,7 +24,4 @@ class Traffic:
             self.vehicles[index] = new_vehicle
 
     def get_vehicle(self, index):
-        if index == 0:
-            return self.ego
-        else:
-            return self.vehicles[index]
+        return self.vehicles[index]
