@@ -20,8 +20,8 @@ class Vehicle:
         self.current_security_time = 0
 
         # vehicle characteristics
-        self.max_braking_acc = -6
-        self.motor_brake_acc = -1.5
+        self.max_braking_acc = -6/3.6
+        self.motor_brake_acc = -1.5/3.6
         self.acc_max = 3
 
         # vehicles monitored
@@ -90,7 +90,8 @@ class Vehicle:
                     max_brake()
                 elif time_of_collision < 6:
                     # collision in between 2 and 6 seconds --> continuum between motor brake and max brake
-                    self.max_braking_acc - (time_of_collision - 2) / 4 * (self.max_braking_acc - self.motor_brake_acc)
+                    self.acc = self.max_braking_acc - \
+                               (time_of_collision - 2) / 4 * (self.max_braking_acc - self.motor_brake_acc)
                 elif time_of_collision < 20:
                     # above 6 seconds, motor brake
                     engine_braking()
