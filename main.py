@@ -81,8 +81,21 @@ def test_front_vehicle_same_speed():
     print("end of simulation")
 
 
+def distance_criticity():
+    critic = lambda d:  1/(1+math.exp(-d-5))
+    criticity_data = []
+    distance_data = []
+    for i in range(-201, 1):
+        d = i/20
+        criticity_data.append(critic(d))
+        distance_data.append(d)
+    plt.plot(distance_data, criticity_data)
+    plt.show()
+
+
 if __name__ == '__main__':
     #test_omega_veh_lane3_overtake_ego_lane2()
-    test_front_vehicle_same_speed()
+    #test_front_vehicle_same_speed()
+    distance_criticity()
 
 
