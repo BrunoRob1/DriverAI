@@ -56,7 +56,7 @@ def test_front_vehicle_same_speed():
     def security_distance(speed_kmh):
         return speed_kmh/3.6 + 4.5
 
-    simulation.get_traffic().add_vehicle(2, -security_distance(120)/2.0, 120, index=1)
+    simulation.get_traffic().add_vehicle(2, -security_distance(120)*0.2, 128, index=1)
 
     simulation.add_output("EGO.y", "simulation.get_traffic().get_vehicle(0).pos")
     simulation.add_output("EGO.Vy", "simulation.get_traffic().get_vehicle(0).v_kmh")
