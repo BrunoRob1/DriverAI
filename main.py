@@ -48,7 +48,6 @@ def test_omega_veh_lane3_overtake_ego_lane2():
 
 def test_front_vehicle_same_speed():
     simulation = Simulation()
-    print("hello")
     # Ego vehicle in the lane 2 (middle) in a highway
     simulation.get_traffic().set_ego(2, 120)
 

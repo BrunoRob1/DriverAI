@@ -40,6 +40,8 @@ def forecast_minimum_distance_AB(y_A0, v_A0, v_B0, acc_A, acc_B):
     delta_a = acc_A - acc_B
     delta = delta_v0*delta_v0 - 2*delta_a*y_A0
 
+    #plot_distance_AB_forecasted(y_A0, v_A0, v_B0, acc_A, acc_B)
+
     estimated_time = None
     # Intersection with y = 0 line
     if abs(delta_a) != 0:
@@ -75,13 +77,13 @@ def forecast_minimum_distance_AB(y_A0, v_A0, v_B0, acc_A, acc_B):
             print("a collision is estimated")
             y_max = 0
         else:
-            y_max = distance_AB(t, y_A0, v_A0, v_B0, acc_A, acc_B)
+            y_max = distance_AB(t_max, y_A0, v_A0, v_B0, acc_A, acc_B)
             if y_max > 0:
                 print("a collision is estimated")
                 y_max = 0
             else:
                 print("distance minimum with veh B is estimated at :" + str(-y_max))
-            return math.abs(y_max)
+                y_max = - y_max
 
     return y_max, estimated_time
 
@@ -99,9 +101,6 @@ def test_function_braking():
     plt.show()
 
 
-print(braking(15, 15, 8, 1.5))
-
-
 if __name__ == '__main__':
     y_A0 = -10
     acc_A = -2
@@ -109,6 +108,6 @@ if __name__ == '__main__':
     v_A0 = 140 / 3.6
     v_B0 = 120 / 3.6
 
-    #forecast_minimum_distance_AB(y_A0, v_A0, v_B0, acc_A, acc_B)
+    forecast_minimum_distance_AB(y_A0, v_A0, v_B0, acc_A, acc_B)
     test_function_braking()
     # from y_max we should estimate the dangerousness = f(criticity, assessment of driver)

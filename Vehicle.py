@@ -104,11 +104,15 @@ class Vehicle:
             else:
                 no_braking()
             """
-            distance_min_forecasted, estimated_time = cr.forecast_minimum_distance_AB(my_position, my_v_mps, veh_in_front_speed,
-                                                                      0, self.acc)
+            print("my_position=" + str(my_position))
+            print("my_v_mps=" + str(my_v_mps))
+            print("vehicle_in_front_speed=" + str(veh_in_front_speed))
+            print("self.acc=" + str(self.acc))
+            (distance_min_forecasted, estimated_time) = cr.forecast_minimum_distance_AB(my_position, my_v_mps,
+                                                                                      veh_in_front_speed,
+                                                                                      self.acc, 0.0)
 
-
-            print( "distance forecasted=" + str(distance_min_forecasted))
+            print("distance forecasted=" + str(distance_min_forecasted) + " at time=" +  str(estimated_time))
 
             equilibrium_safety_distance = self.equilibrium_security_time * self.v_mps
 
@@ -132,7 +136,6 @@ class Vehicle:
     """
     def is_there_a_vehicle_in_front(self):
         vehicles = self.traffic.vehicles.values()
-        print(len(vehicles))
         count = 0
         for veh in vehicles:
             if veh.lane == self.lane:
