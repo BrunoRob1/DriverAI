@@ -1,3 +1,6 @@
+import Criticity as cr
+
+
 class Vehicle:
     def __init__(self, index, lane, relative_pos, velocity_kmh, traffic):
         # physical variables
@@ -81,6 +84,7 @@ class Vehicle:
 
             time_of_collision = time_before_collision(my_position, my_v_mps, veh_in_front_position, veh_in_front_speed)
 
+            """
             if cst < self.equilibrium_security_time:
                 # no collision anticipated
                 if time_of_collision < 0:
@@ -99,6 +103,18 @@ class Vehicle:
                     no_braking()
             else:
                 no_braking()
+            """
+            distance_min_forecasted, estimated_time = cr.forecast_minimum_distance_AB(my_position, my_v_mps, veh_in_front_speed,
+                                                                      0, self.acc)
+
+
+            print( "distance forecasted=" + str(distance_min_forecasted))
+
+            equilibrium_safety_distance = self.equilibrium_security_time * self.v_mps
+
+            new_braking = cr.braking(distance_min_forecasted, equilibrium_safety_distance, self.max_braking_acc,
+                                     self.motor_brake_acc)
+            self.acc = new_braking
 
         def accelerate():
             v = self.v_mps

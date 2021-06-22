@@ -95,7 +95,7 @@ def distance_criticity():
 
 if __name__ == '__main__':
     #test_omega_veh_lane3_overtake_ego_lane2()
-    #test_front_vehicle_same_speed()
-    distance_criticity()
+    test_front_vehicle_same_speed()
+    #distance_criticity()
 
 
