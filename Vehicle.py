@@ -12,19 +12,20 @@ class Vehicle:
         self.lane = lane
         self.pos = relative_pos
         self.v_mps = velocity_kmh / 3.6
-        self.v_mps_eq = self.v_mps
         self.v_kmh = velocity_kmh
         self.traffic = traffic  # type: Traffic
 
-        # other variables
+        # driver variables
+        self.v_mps_eq = self.v_mps
         self.constrained = 0    # between 0 and 1
         self.equilibrium_security_time = 1.0    # for the current driver
         self.critical_security_time = 0.3
         self.current_security_time = 0
 
         # vehicle characteristics
-        self.max_braking_acc = -6/3.6
-        self.motor_brake_acc = -1.5/3.6
+        self.max_braking = -10/3.6
+        self.medium_braking = -5 / 3.6
+        self.motor_braking = -1.5/3.6
         self.acc_max = 3
 
         # vehicles monitored
@@ -45,7 +46,8 @@ class Vehicle:
             self.current_security_time = 0
             self.index_in_front = -1
 
-        self.compute_acceleration()
+        self.compute_driver_behavior()
+        #self.compute_acceleration()
 
         # update of speed
         self.v_mps = self.v_mps + self.acc * dt
@@ -54,12 +56,12 @@ class Vehicle:
         # update of position
         self.pos = self.pos + (self.v_mps - self.traffic.vehicles[0].v_mps) * dt
 
-    def compute_acceleration(self):
+    def compute_driver_behavior(self):
         def engine_braking():
-            self.acc = self.motor_brake_acc
+            self.acc = self.motor_braking
 
         def max_brake():
-            self.acc = self.max_braking_acc
+            self.acc = self.max_braking
 
         def no_braking():
             self.acc = 0
@@ -108,17 +110,37 @@ class Vehicle:
             print("my_v_mps=" + str(my_v_mps))
             print("vehicle_in_front_speed=" + str(veh_in_front_speed))
             print("self.acc=" + str(self.acc))
-            (distance_min_forecasted, estimated_time) = cr.forecast_minimum_distance_AB(my_position, my_v_mps,
-                                                                                      veh_in_front_speed,
-                                                                                      self.acc, 0.0)
 
-            print("distance forecasted=" + str(distance_min_forecasted) + " at time=" +  str(estimated_time))
+            # If no braking is applied
+            (distance_min_forecasted, estimated_time) = cr.predict_minimum_distance_AB(my_position, my_v_mps,
+                                                                                       veh_in_front_speed,
+                                                                                       0.0, 0.0)
 
-            equilibrium_safety_distance = self.equilibrium_security_time * self.v_mps
+            # If a motor braking is applied
+            (distance_min_forecasted, estimated_time) = cr.predict_minimum_distance_AB(my_position, my_v_mps,
+                                                                                       veh_in_front_speed,
+                                                                                       self.acc, 0.0)
+            no_braking_veh_in_front = False
+            # If normal braking is applied
+            if not estimated_time is None:
+                if(estimated_time > 0 and estimated_time < 10):
 
-            new_braking = cr.braking(distance_min_forecasted, equilibrium_safety_distance, self.max_braking_acc,
-                                     self.motor_brake_acc)
-            self.acc = new_braking
+                    print("distance forecasted=" + str(distance_min_forecasted) + " at time=" + str(estimated_time))
+
+                    equilibrium_safety_distance = self.equilibrium_security_time * self.v_mps
+
+                    new_braking = cr.braking(distance_min_forecasted, equilibrium_safety_distance, self.max_braking,
+                                             self.motor_braking)
+                    self.acc = new_braking
+                else:
+                    no_braking_veh_in_front = True
+
+            if no_braking_veh_in_front:
+                if self.v_mps < self.v_mps_eq:
+                    self.acc = self.acc_max
+                elif self.v_mps > self.v_mps_eq:
+                    self.acc = self.motor_braking
+
 
         def accelerate():
             v = self.v_mps

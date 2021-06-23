@@ -15,6 +15,7 @@ def print_curves(t, y1, y2):
     plt.plot(t, y2, 'b')
     plt.show()
 
+
 def print_curve(t, y):
     plt.plot(t, y, 'b')
     plt.show()
@@ -55,13 +56,14 @@ def test_front_vehicle_same_speed():
     def security_distance(speed_kmh):
         return speed_kmh/3.6 + 4.5
 
-    simulation.get_traffic().add_vehicle(2, -security_distance(120)*0.2, 128, index=1)
+    simulation.get_traffic().add_vehicle(2, -security_distance(120)*2, 135, index=1)
 
     simulation.add_output("EGO.y", "simulation.get_traffic().get_vehicle(0).pos")
     simulation.add_output("EGO.Vy", "simulation.get_traffic().get_vehicle(0).v_kmh")
 
     simulation.add_output("VEH1.y", "simulation.get_traffic().get_vehicle(1).pos")
     simulation.add_output("VEH1.Vy", "simulation.get_traffic().get_vehicle(1).v_kmh")
+    simulation.add_output("VEH1.acc", "simulation.get_traffic().get_vehicle(1).acc")
 
     simulation.add_output("VEH1.security_time", "simulation.get_traffic().get_vehicle(1).current_security_time")
 
@@ -76,6 +78,7 @@ def test_front_vehicle_same_speed():
     print_curves(t, simulation.get_output("VEH1.y"), simulation.get_output("EGO.y"))
     print_curves(t, simulation.get_output("VEH1.Vy"), simulation.get_output("EGO.Vy"))
     print_curve(t, simulation.get_output("VEH1.security_time"))
+    print_curve(t, simulation.get_output("VEH1.acc"))
 
     print("end of simulation")
 

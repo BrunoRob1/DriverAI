@@ -8,21 +8,35 @@ some parameters of the vehicle (brake power, acceleration power).
 Vehicles are supposed to be on the same lane, and near each other
 """
 
-
-
-# scenario : Vehicle A is behind vehicle B
-# distance between veh A and veh B forecasted at time > 0 if their acceleration stays constant
-# is a function of initial position y0_A of vehicle A and its initial speed v0_A,
-# behind vehicle B (y0 = 0) with initial v0_B
+"""
+Scenario : Vehicle A is behind vehicle B
+Distance between veh A and veh B forecasted at time > 0, assuming their acceleration stays constant.
+Is a function of vehicle A initial position (y0_A)  and initial speed (v0_A),
+and of vehicle B position (yB = 0, stays constant as B is the reference frame) with initial v0_B
+"""
+# TODO: Vehicle A must be the reference frame
 def distance_AB(time, y0_A, v0_A, v0_B, acc_A, acc_B):
     return y0_A + (v0_A - v0_B)*time + 0.5*(acc_A - acc_B)*time*time
 
 
+"""
+Returns the braking that must be applied as a function of the minimum distance predicted by the model
+"""
 def braking(d_min, d_eq, brake_max, motor_brake):
-    return (brake_max - motor_brake)/(1+(math.exp((d_min-d_eq)/(0.2*d_eq)))) + motor_brake
+    return brake_max/(1+(math.exp((d_min-d_eq)/(0.2*d_eq))))
 
 
-def plot_distance_AB_forecasted(y_A0, v_A0, v_B0, acc_A, acc_B):
+"""
+Models of braking willingness vs the distance of a vehicle B in front from ego vehicle (A)
+0 : behavior is to tend to our equilibrium speed
+1 : braking is applied to avoid potential collision 
+"""
+def braking_will(d, d_eq):
+    return 1 / (1 + math.exp((d - d_eq)/5.0))
+
+
+
+def test_plot_distance_AB_predicted(y_A0, v_A0, v_B0, acc_A, acc_B):
     coord_data = []
     time_data = []
     for i in range(0, 201):
@@ -34,13 +48,25 @@ def plot_distance_AB_forecasted(y_A0, v_A0, v_B0, acc_A, acc_B):
     plt.ylabel("distance A-B")
     plt.show()
 
+def test_plot_braking_will(d_eq):
+    braking_will_data = []
+    distance_data = []
+    for i in range(0, 301):
+        d = i
+        braking_will_data.append(braking_will(d, d_eq))
+        distance_data.append(d)
+    plt.plot(distance_data, braking_will_data)
+    plt.xlabel("distance (m)")
+    plt.ylabel("braking will")
+    plt.show()
 
-def forecast_minimum_distance_AB(y_A0, v_A0, v_B0, acc_A, acc_B):
+
+def predict_minimum_distance_AB(y_A0, v_A0, v_B0, acc_A, acc_B):
     delta_v0 = v_A0 - v_B0
     delta_a = acc_A - acc_B
     delta = delta_v0*delta_v0 - 2*delta_a*y_A0
 
-    #plot_distance_AB_forecasted(y_A0, v_A0, v_B0, acc_A, acc_B)
+    #test_plot_distance_AB_predicted(y_A0, v_A0, v_B0, acc_A, acc_B)
 
     estimated_time = None
     # Intersection with y = 0 line
@@ -87,6 +113,7 @@ def forecast_minimum_distance_AB(y_A0, v_A0, v_B0, acc_A, acc_B):
 
     return y_max, estimated_time
 
+
 def test_function_braking():
     distances = []
     braking_list = []
@@ -108,6 +135,7 @@ if __name__ == '__main__':
     v_A0 = 140 / 3.6
     v_B0 = 120 / 3.6
 
-    forecast_minimum_distance_AB(y_A0, v_A0, v_B0, acc_A, acc_B)
+    predict_minimum_distance_AB(y_A0, v_A0, v_B0, acc_A, acc_B)
     test_function_braking()
+    test_plot_braking_will(70)
     # from y_max we should estimate the dangerousness = f(criticity, assessment of driver)
